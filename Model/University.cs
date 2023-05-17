@@ -1,12 +1,10 @@
 ﻿namespace API_Web.Model
 {
-    public class University
+    public class University : BaseEntity
     {
-        public Guid guid { get; set; }
-        public string code { get; set; }
-        public string name { get; set; }
-        public DateTime createdDate { get; set; }
-        public DateTime modifiedDate { get; set; }
+        BaseEntity.
+        public string Code { get; set; }
+        public string Name { get; set; }
 
     }
 }

@@ -1,14 +1,11 @@
 ﻿namespace API_Web.Model
 {
-    public class Account
+    public class Account : BaseEntity
     {
-        public Guid guid { get; set; }
-        public string password { get; set; }
-        public bool isDeleted { get; set; }
-        public int otp { get; set; }
-        public bool isUsed { get; set; }
-        public DateTime expiredTime { get; set; }
-        public DateTime createdDate { get; set; }
-        public DateTime modifiedDate { get; set; }
+        public string Password { get; set; }
+        public bool IsDeleted { get; set; }
+        public int OTP { get; set; }
+        public bool IsUsed { get; set; }
+        public DateTime ExpiredTime { get; set; }
     }
 }

@@ -2,17 +2,14 @@
 {
     public class Employee
     {
-        public Guid guid { get; set; }
-        public char nik { get; set; }
-        public string firstName { get; set; }
-        public string lastName { get; set; }
-        public DateTime birthDate { get; set; }
+        public char NIK { get; set; }
+        public string FirstName { get; set; }
+        public string LastName { get; set; }
+        public DateTime BirthDate { get; set; }
         public int Gender { get; set; }
-        public DateTime hiringDate { get; set; }
-        public string email { get; set; }
-        public string phoneNumber { get; set; }
-        public DateTime createdDate { get; set; }
-        public DateTime modifiedDate { get; set; }
+        public DateTime HiringDate { get; set; }
+        public string Email { get; set; }
+        public string PhoneNumber { get; set; }
 
     }
 }

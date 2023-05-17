@@ -2,14 +2,11 @@
 {
     public class Booking
     {
-        public Guid guid { get; set; }
-        public DateTime startDate { get; set; }
-        public DateTime endDate { get; set; }
-        public int status { get; set; }
-        public string remarks { get; set; }
-        public DateTime createdDate { get; set; }
-        public DateTime modifiedDate { get; set; }
-        public Guid roomGuid { get; set; }
-        public Guid employeeGuid { get; set; }
+        public DateTime StartDate { get; set; }
+        public DateTime EndDate { get; set; }
+        public int Status { get; set; }
+        public string Remarks { get; set; }
+        public Guid RoomGuid { get; set; }
+        public Guid EmployeeGuid { get; set; }
     }
 }
