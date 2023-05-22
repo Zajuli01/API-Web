@@ -2,7 +2,7 @@
 
 namespace API_Web.Contracts;
 
-public interface IUniversityRepository
+public interface IUniversityRepository : IGeneralRepository<University>
 {
     University Create(University university);
     bool Update(University university);

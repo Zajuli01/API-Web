@@ -7,7 +7,7 @@ namespace API_Web.Model;
 public class Employee : BaseEntity
 {
     [Column("nik", TypeName = "nchar(6)")]
-    public char NIK { get; set; }
+    public char? NIK { get; set; }
     [Column("first_name", TypeName = "nvarchar(100)")]
     public string FirstName { get; set; }
     [Column("last_name", TypeName = "nvarchar(100)")]
@@ -24,8 +24,8 @@ public class Employee : BaseEntity
     public string PhoneNumber { get; set; }
 
     //Cardinality
-    public Education Education { get; set; }
-    public Account Account { get; set; }
-    public ICollection<Booking> Bookings { get; set; }
+    public Education? Education { get; set; }
+    public Account? Account { get; set; }
+    public ICollection<Booking>? Bookings { get; set; }
 
 }
