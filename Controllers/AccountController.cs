@@ -1,5 +1,9 @@
 ﻿using API_Web.Contracts;
 using API_Web.Model;
+using API_Web.ViewModels.AccountRoles;
+using API_Web.ViewModels.Accounts;
+using API_Web.ViewModels.Bookings;
+using API_Web.ViewModels.Employees;
 using Microsoft.AspNetCore.Mvc;
 
 namespace API_Web.Controllers;
@@ -9,9 +13,25 @@ namespace API_Web.Controllers;
 public class AccountController : ControllerBase
 {
     private readonly IAccountRepository _accountRepository;
-    public AccountController(IAccountRepository accountRepository)
+    private readonly IEmployeeRepository _employeeRepository;
+    private readonly IAccountRoleRepository _accountRoleRepository;
+    private readonly IMapper<Account, AccountVM> _mapper;
+    private readonly IMapper<Employee, EmployeeVM> _employeeVMMapper;
+    private readonly IMapper<AccountRole, AccountRoleVM> _accountRoleVMMapper;
+
+    public AccountController(IAccountRepository accountRepository, 
+        IEmployeeRepository employeeRepository, 
+        IAccountRoleRepository accountRoleRepository, 
+        IMapper<Account, AccountVM> mapper,
+        IMapper<Employee, EmployeeVM> employeeVMMapper,
+        IMapper<AccountRole, AccountRoleVM> accountRoleVMMapper)
     {
         _accountRepository = accountRepository;
+        _employeeRepository = employeeRepository;
+        _accountRoleRepository = accountRoleRepository;
+        _mapper = mapper;
+        _employeeVMMapper = employeeVMMapper;
+        _accountRoleVMMapper = accountRoleVMMapper;
     }
 
     [HttpGet]
@@ -22,8 +42,9 @@ public class AccountController : ControllerBase
         {
             return NotFound();
         }
+        var result = account.Select(_mapper.Map).ToList();
 
-        return Ok(account);
+        return Ok(result);
     }
 
     [HttpGet("{guid}")]
@@ -34,14 +55,16 @@ public class AccountController : ControllerBase
         {
             return NotFound();
         }
+        var data = _mapper.Map(account);
 
         return Ok(account);
     }
 
     [HttpPost]
-    public IActionResult Create(Account account)
+    public IActionResult Create(AccountVM accountVM)
     {
-        var result = _accountRepository.Create(account);
+        var resultConverted = _mapper.Map(accountVM);
+        var result = _accountRepository.Create(resultConverted);
         if (result is null)
         {
             return BadRequest();
@@ -51,9 +74,10 @@ public class AccountController : ControllerBase
     }
 
     [HttpPut]
-    public IActionResult Update(Account account)
+    public IActionResult Update(AccountVM accountVM)
     {
-        var isUpdated = _accountRepository.Update(account);
+        var resultConverted = _mapper.Map(accountVM);
+        var isUpdated = _accountRepository.Update(resultConverted);
         if (!isUpdated)
         {
             return BadRequest();

@@ -2,7 +2,7 @@
 
 namespace API_Web.Contracts;
 
-public interface IRoleRepository
+public interface IRoleRepository : IGeneralRepository<Role>
 {
     Role Create(Role role);
     bool Update(Role role);

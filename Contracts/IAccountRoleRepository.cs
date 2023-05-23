@@ -2,7 +2,7 @@
 
 namespace API_Web.Contracts;
 
-public interface IAccountRoleRepository
+public interface IAccountRoleRepository : IGeneralRepository<AccountRole>
 {
     AccountRole Create(AccountRole accountRole);
     bool Update(AccountRole accountRole);

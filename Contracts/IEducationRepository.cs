@@ -2,7 +2,7 @@
 
 namespace API_Web.Contracts;
 
-public interface IEducationRepository
+public interface IEducationRepository : IGeneralRepository<Education>
 {
     Education Create(Education education);
     bool Update(Education education);

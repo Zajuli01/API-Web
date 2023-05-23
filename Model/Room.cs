@@ -14,5 +14,4 @@ public class Room : BaseEntity
 
     //Cardinality
     public ICollection<Booking>? Bookings { get; set; }
-
 }
