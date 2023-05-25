@@ -8,12 +8,13 @@ namespace API_Web.Repositories;
 
 public class AccountRepository : GeneralRepository<Account>, IAccountRepository
 {
-    private readonly BookingManagementDBContext _context;
-    private readonly IUniversityRepository _universityRepository;
     private readonly IEmployeeRepository _employeeRepository;
+    private readonly IUniversityRepository _universityRepository;
     private readonly IEducationRepository _educationRepository;
-    private readonly IAccountRepository _accountRepository;
-    public AccountRepository(BookingManagementDBContext context,
+    private readonly BookingManagementDBContext _context;
+
+    public AccountRepository(
+        BookingManagementDBContext context,
         IUniversityRepository universityRepository,
         IEmployeeRepository employeeRepository,
         IEducationRepository educationRepository
@@ -22,7 +23,9 @@ public class AccountRepository : GeneralRepository<Account>, IAccountRepository
         _universityRepository = universityRepository;
         _employeeRepository = employeeRepository;
         _educationRepository = educationRepository;
+        _context = context;
     }
+
 
 
 

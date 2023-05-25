@@ -11,7 +11,8 @@ public interface IAccountRepository : IGeneralRepository<Account>
     IEnumerable<Account> GetAll();
     Account? GetByGuid(Guid guid);
 
-    public int ChangePasswordAccount(Guid? employeeId, ChangePasswordVM changePasswordVM);
+    int ChangePasswordAccount(Guid? employeeId, ChangePasswordVM changePasswordVM);
+
     int UpdateOTP(Guid? employeeId);
 
     int Register(RegisterVM registerVM);

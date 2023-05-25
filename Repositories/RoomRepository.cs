@@ -10,25 +10,27 @@ namespace API_Web.Repositories;
 public class RoomRepository : GeneralRepository<Room>, IRoomRepository
 {
     private readonly BookingManagementDBContext _context;
-    private readonly IBookingRepository _bookingRepository;
 
     private readonly IEmployeeRepository _employeeRepository;
     private readonly IRoomRepository _roomRepository;
 
 
 
-    private readonly IBookingRepository _contextBooking;
-    public RoomRepository(BookingManagementDBContext context, IBookingRepository booking) : base(context)
+    private readonly IBookingRepository _bookingRepository;
+    public RoomRepository(BookingManagementDBContext context, IBookingRepository booking, IEmployeeRepository employeeRepository) : base(context)
     {
-        _contextBooking = booking;
+        _context = context;
+        _bookingRepository = booking;
+        _employeeRepository = employeeRepository;
     }
+
 
     public IEnumerable<RoomBookedTodayVM> GetRoomByDate()
     {
         try
         {
             //get all data from booking and rooms
-            var booking = _contextBooking.GetAll();
+            var booking = _bookingRepository.GetAll();
             var rooms = GetAll();
 
             var startToday = DateTime.Today;
@@ -73,7 +75,7 @@ public class RoomRepository : GeneralRepository<Room>, IRoomRepository
         try
         {
             //get all data from booking and rooms
-            var booking = _contextBooking.GetAll();
+            var booking = _bookingRepository.GetAll();
             var rooms = GetAll();
 
             var startToday = DateTime.Today;
@@ -119,14 +121,14 @@ public class RoomRepository : GeneralRepository<Room>, IRoomRepository
     public IEnumerable<MasterRoomVM> GetByDate(DateTime dateTime)
     {
         var rooms = GetAll();
-        var bookings = _bookingRepository.GetAll();
-        var employees = _employeeRepository.GetAll();
+        var bookings = _context.Bookings.ToList();
+        var employees = _context.Employees.ToList();
 
         var usedRooms = new List<MasterRoomVM>();
 
         foreach (var room in rooms)
         {
-            var booking = bookings.FirstOrDefault(b => b.RoomGuid == room.Guid && b.StartDate <= dateTime && b.EndDate >= dateTime);
+            var booking = bookings.FirstOrDefault(b => b.RoomGuid == room?.Guid && b.StartDate <= dateTime && b.EndDate >= dateTime);
             if (booking != null)
             {
                 var employee = employees.FirstOrDefault(e => e.Guid == booking.EmployeeGuid);
@@ -153,8 +155,8 @@ public class RoomRepository : GeneralRepository<Room>, IRoomRepository
     public IEnumerable<RoomUsedVM> GetCurrentlyUsedRooms()
     {
         var rooms = GetAll();
-        var bookings = _bookingRepository.GetAll();
-        var employees = _employeeRepository.GetAll();
+        var bookings = _context.Bookings.ToList();
+        var employees = _context.Employees.ToList();
 
         var usedRooms = new List<RoomUsedVM>();
 
@@ -162,7 +164,7 @@ public class RoomRepository : GeneralRepository<Room>, IRoomRepository
 
         foreach (var room in rooms)
         {
-            var booking = bookings.FirstOrDefault(b => b.RoomGuid == room.Guid && b.StartDate <= currentTime && b.EndDate >= currentTime);
+            var booking = bookings.FirstOrDefault(b => b.RoomGuid == room?.Guid && b.StartDate <= currentTime && b.EndDate >= currentTime);
             if (booking != null)
             {
                 var employee = employees.FirstOrDefault(e => e.Guid == booking.EmployeeGuid);
@@ -179,26 +181,5 @@ public class RoomRepository : GeneralRepository<Room>, IRoomRepository
             }
         }
         return usedRooms;
-    
-}
-
-    //public IEnumerable<Room> GetDateTime(DateTime dateTime)
-    //{
-    //    var bookings = _bookingRepository.GetAll();
-    //    var filteredRooms = bookings.Where(booking => booking.StartDate <= dateTime && booking.EndDate >= dateTime).ToList();
-
-    //    var result = filteredRooms.Select(booking => new Room
-    //    {
-    //        BookedBy = booking.Employee != null ? $"{booking.Employee.FirstName} {booking.Employee.LastName}" : string.Empty,
-    //        Status = booking.Status.ToString(),
-    //        RoomName = booking.Room?.Name,
-    //        Floor = booking.Room?.Floor,
-    //        Capacity = booking.Room?.Capacity,
-    //        StartDate = booking.StartDate,
-    //        EndDate = booking.EndDate
-    //    });
-
-    //    return result;
-    //}
-
+    }
 }

@@ -66,82 +66,19 @@ public class RoomController : ControllerBase
         return Ok(room);
     }
 
-    [HttpGet("CurrentlyUsedRoomsByDate")]
+
+
+
+
+    [HttpGet("GetCurrentlyUsedRooms")]
     public IActionResult GetCurrentlyUsedRooms(DateTime dateTime)
     {
         var room = _roomRepository.GetByDate(dateTime);
-        if (room is null)
+        if(room is null)
         {
             return NotFound();
         }
-
         return Ok(room);
-    }
-
-    //[HttpGet("CurrentlyUsedRooms")]
-    //public IActionResult GetDateTimeRooms()
-    //{
-    //    DateTime now = DateTime.Now;
-    //    var booking = _bookingRepository.GetByDate(now);
-    //    if (booking is null)
-    //    {
-    //        return NotFound();
-    //    }
-    //    var room = _roomRepository.GetByDate(now);
-    //    if (room is null)
-    //    {
-    //        return NotFound();
-    //    }
-    //    var emp = _employeeRepository.GetByDate(now);
-    //    if (emp is null)
-    //    {
-    //        return NotFound();
-    //    }
-
-
-    //    var data = new
-    //    {
-    //        BookedBy = emp.FirstName + " " + emp.LastName,
-    //        Status = booking.Status.ToString(),
-    //        RoomName = room.Name,
-    //        Floor = room.Floor.ToString(),
-    //        Capacity = room.Capacity,
-    //        StartDate = booking.StartDate,
-    //        EndDate = booking.EndDate
-    //    };
-
-
-
-    //    return Ok(data);
-    //}
-
-
-
-
-
-
-    [HttpGet("RoomsByDateTime")]
-    public IActionResult GetRoomsByDateTime(DateTime dateTime)
-    {
-
-        var room = _roomRepository.GetAll();
-        var booking = _bookingRepository.GetAll();
-        var emp = _employeeRepository.GetAll();
-        var filteredRooms = booking.Where(booking => booking.StartDate <= dateTime && booking.EndDate >= dateTime).ToList();
-
-        var result = filteredRooms.Select(room => new
-        {
-
-            BookedBy = room.Employee.FirstName + " " + room.Employee.LastName,
-            Status = room.Status.ToString(),
-            RoomName = room.Room.Name,
-            Floor = room.Room.Floor,
-            Capacity = room.Room.Capacity,
-            StartDate = room.StartDate,
-            EndDate = room.EndDate
-        });
-
-        return Ok(result);
     }
 
 

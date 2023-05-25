@@ -15,6 +15,7 @@ public interface IRoomRepository : IGeneralRepository<Room>
     IEnumerable<MasterRoomVM> GetByDate(DateTime dateTime);
     IEnumerable<RoomUsedVM> GetCurrentlyUsedRooms();
     IEnumerable<RoomBookedTodayVM> GetRoomByDate();
+
 }
 
 
