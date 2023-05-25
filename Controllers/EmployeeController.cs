@@ -48,53 +48,77 @@ public class EmployeeController : ControllerBase
         _universityRepository = universityRepository;
         _universityVMMapper = universityVMMapper;
     }
+    [HttpGet("GetAllMasterEmployee")]
+    public IActionResult GetAllMasterEmployee()
+    {
+        var masterEmployees = _employeeRepository.GetAllMasterEmployee();
+        if (!masterEmployees.Any())
+        {
+            return NotFound();
+        }
 
-        //[HttpGet("WithEducation")]
-        //public IActionResult GetAllWithEducation()
-        //{
-        //var edu = _educationRepository.GetAll();
-        //if (edu.Any())
-        //{
-        //    return NotFound();
-        //}
-        //var emp = _employeeRepository.GetAll();
-        //if (emp.Any())
-        //{
-        //    return NotFound();
-        //}
-        //var univ = _universityRepository.GetAll();
-        //if (univ.Any())
-        //{
-        //    return NotFound();
-        //}
+        return Ok(masterEmployees);
+    }
 
-        //    var educationGet = edu;
-        //    var employeeGet = emp;
-        //    var universityGet = univ;
+    [HttpGet("GetMasterEmployeeByGuid")]
+    public IActionResult GetMasterEmployeeByGuid()
+    {
+        var masterEmployees = _employeeRepository.GetAll();
+        if (!masterEmployees.Any())
+        {
+            return NotFound();
+        }
 
-        //    var getAll = from e in employeeGet
-        //                 join ed in educationGet on e.Guid equals ed.Guid
-        //                 join uni in universityGet on ed.UniversityGuid equals uni.Guid
-        //                 select new
-        //                 {
-        //                     GUID = e.Guid,
-        //                     NIK = e.NIK,
-        //                     Fullname = e.FirstName + " " + e.LastName,
-        //                     Birtdate = e.BirthDate,
-        //                     Gender = e.Gender,
-        //                     HiringDate = e.HiringDate,
-        //                     Email = e.Email,
-        //                     PhoneNumber = e.PhoneNumber,
-        //                     Major = ed.Major,
-        //                     Degree = ed.Degree,
-        //                     GPA = ed.GPA,
-        //                     University = uni.Name
-        //                 };
+        return Ok(masterEmployees);
+    }
 
-        //    var response = getAll.ToList();
 
-        //    return Ok(response);
-        //}
+    //[HttpGet("WithEducation")]
+    //public IActionResult GetAllWithEducation()
+    //{
+    //var edu = _educationRepository.GetAll();
+    //if (edu.Any())
+    //{
+    //    return NotFound();
+    //}
+    //var emp = _employeeRepository.GetAll();
+    //if (emp.Any())
+    //{
+    //    return NotFound();
+    //}
+    //var univ = _universityRepository.GetAll();
+    //if (univ.Any())
+    //{
+    //    return NotFound();
+    //}
+
+    //    var educationGet = edu;
+    //    var employeeGet = emp;
+    //    var universityGet = univ;
+
+    //    var getAll = from e in employeeGet
+    //                 join ed in educationGet on e.Guid equals ed.Guid
+    //                 join uni in universityGet on ed.UniversityGuid equals uni.Guid
+    //                 select new
+    //                 {
+    //                     GUID = e.Guid,
+    //                     NIK = e.NIK,
+    //                     Fullname = e.FirstName + " " + e.LastName,
+    //                     Birtdate = e.BirthDate,
+    //                     Gender = e.Gender,
+    //                     HiringDate = e.HiringDate,
+    //                     Email = e.Email,
+    //                     PhoneNumber = e.PhoneNumber,
+    //                     Major = ed.Major,
+    //                     Degree = ed.Degree,
+    //                     GPA = ed.GPA,
+    //                     University = uni.Name
+    //                 };
+
+    //    var response = getAll.ToList();
+
+    //    return Ok(response);
+    //}
 
 
 
@@ -145,17 +169,17 @@ public class EmployeeController : ControllerBase
         }
     }
 
-    [HttpGet("GetByGuidWithEducation/{guid}")]
-    public IActionResult GetByGuidWithEducation2(Guid guid)
-    {
-        var employeeData = _employeeRepository.GetByGuidWithEducation(guid);
-        if (employeeData is null)
-        {
-            return NotFound();
-        }
+    //[HttpGet("GetByGuidWithEducation/{guid}")]
+    //public IActionResult GetByGuidWithEducation2(Guid guid)
+    //{
+    //    var employeeData = _employeeRepository.GetByGuidWithEducation(guid);
+    //    if (employeeData is null)
+    //    {
+    //        return NotFound();
+    //    }
 
-        return Ok(employeeData);
-    }
+    //    return Ok(employeeData);
+    //}
 
 
 

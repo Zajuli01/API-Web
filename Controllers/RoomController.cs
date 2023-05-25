@@ -33,6 +33,51 @@ public class RoomController : ControllerBase
         _employeeVMMapper = employeeVMMapper;
     }
 
+
+    [HttpGet("RoomAvailable")]
+    public IActionResult GetRoomByDate()
+    {
+        try
+        {
+            var room = _roomRepository.GetRoomByDate();
+            if (room is null)
+            {
+                return Ok("tidak ada data");
+            }
+
+            return Ok(room);
+        }
+        catch
+        {
+            return Ok("ada error");
+        }
+    }
+
+
+    [HttpGet("CurrentlyUsedRooms")]
+    public IActionResult GetCurrentlyUsedRooms()
+    {
+        var room = _roomRepository.GetCurrentlyUsedRooms();
+        if (room is null)
+        {
+            return NotFound();
+        }
+
+        return Ok(room);
+    }
+
+    [HttpGet("CurrentlyUsedRoomsByDate")]
+    public IActionResult GetCurrentlyUsedRooms(DateTime dateTime)
+    {
+        var room = _roomRepository.GetByDate(dateTime);
+        if (room is null)
+        {
+            return NotFound();
+        }
+
+        return Ok(room);
+    }
+
     //[HttpGet("CurrentlyUsedRooms")]
     //public IActionResult GetDateTimeRooms()
     //{
@@ -72,42 +117,23 @@ public class RoomController : ControllerBase
 
 
 
-    [HttpGet("CurrentlyUsedRooms")]
-    public IActionResult GetCurrentlyUsedRooms(Guid guid)
-    {
-        var booking = _bookingRepository.GetByGuid(guid);
-        if (booking is null)
-        {
-            return NotFound();
-        }
-        var room = _roomRepository.GetByGuid(guid);
-        if (room is null)
-        {
-            return NotFound();
-        }
-        DateTime now = DateTime.Now;
-
-        var data = new
-        {
-            RoomName = room.Name,
-            Floor = room.Floor.ToString(),
-            Status = booking.Status.ToString(),
-            Booked = booking.RoomGuid = room.Guid
-        };
 
 
 
-        return Ok(data);
-    }
     [HttpGet("RoomsByDateTime")]
     public IActionResult GetRoomsByDateTime(DateTime dateTime)
     {
-        var filteredRooms = _roomRepository.GetRoomsByDateTime(dateTime);
+
+        var room = _roomRepository.GetAll();
+        var booking = _bookingRepository.GetAll();
+        var emp = _employeeRepository.GetAll();
+        var filteredRooms = booking.Where(booking => booking.StartDate <= dateTime && booking.EndDate >= dateTime).ToList();
 
         var result = filteredRooms.Select(room => new
         {
+
             BookedBy = room.Employee.FirstName + " " + room.Employee.LastName,
-            Status = GetRoomStatus(room, dateTime),
+            Status = room.Status.ToString(),
             RoomName = room.Room.Name,
             Floor = room.Room.Floor,
             Capacity = room.Room.Capacity,
@@ -116,40 +142,8 @@ public class RoomController : ControllerBase
         });
 
         return Ok(result);
-        //var rooms = _roomRepository.GetAll();
-        //var booking = _bookingRepository.GetAll();
-        //var filteredRooms = booking.Where(booking => booking.StartDate <= dateTime && booking.EndDate >= dateTime).ToList();
-
-        //var result = filteredRooms.Select(room => new
-        //{
-
-        //    BookedBy = room.Employee.FirstName + " "+ room.Employee.LastName,
-        //    Status = GetRoomStatus(room, dateTime),
-        //    RoomName = room.Room.Name,
-        //    Floor = room.Room.Floor,
-        //    Capacity = room.Room.Capacity,
-        //    StartDate = room.StartDate,
-        //    EndDate = room.EndDate
-        //});
-
-        //return Ok(result);
     }
 
-    private string GetRoomStatus(Booking booking, DateTime dateTime)
-    {
-        if (booking.StartDate <= dateTime && booking.EndDate >= dateTime)
-        {
-            return "Occupied";
-        }
-        else if (booking.StartDate > dateTime)
-        {
-            return "Booked";
-        }
-        else
-        {
-            return "Available";
-        }
-    }
 
 
     [HttpGet]

@@ -7,7 +7,7 @@ namespace API_Web.Model;
 public class Employee : BaseEntity
 {
     [Column("nik", TypeName = "nchar(6)")]
-    public char? NIK { get; set; }
+    public string? NIK { get; set; }
     [Column("first_name", TypeName = "nvarchar(100)")]
     public string FirstName { get; set; }
     [Column("last_name", TypeName = "nvarchar(100)")]

@@ -28,6 +28,58 @@ public class BookingController : ControllerBase
         _employeeVMMapper = employeeVMMapper;
     }
 
+
+    [HttpGet("BookingDetail")]
+    public IActionResult GetAllBookingDetail()
+    {
+        try
+        {
+            var bookingDetails = _bookingRepository.GetAllBookingDetail();
+
+            return Ok(bookingDetails);
+
+        }
+        catch
+        {
+            return Ok("error");
+        }
+    }
+
+    [HttpGet("BookingDetail/{guid}")]
+    public IActionResult GetDetailByGuid(Guid guid)
+    {
+        try
+        {
+            var booking = _bookingRepository.GetBookingDetailByGuid(guid);
+            if (booking is null)
+            {
+
+                return NotFound();
+            }
+
+            return Ok(booking);
+        }
+        catch
+        {
+            return Ok("error");
+        }
+    }
+
+    [HttpGet("bookinglength")]
+    public IActionResult GetDuration()
+    {
+        var bookingLengths = _bookingRepository.GetBookingDuration();
+        if (!bookingLengths.Any())
+        {
+            return NotFound();
+        }
+
+        return Ok(bookingLengths);
+    }
+
+
+
+
     [HttpGet]
     public IActionResult GetAll()
     {

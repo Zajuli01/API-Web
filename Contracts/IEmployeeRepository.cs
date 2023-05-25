@@ -1,4 +1,5 @@
 ﻿using API_Web.Model;
+using API_Web.ViewModels.Employees;
 
 namespace API_Web.Contracts;
 
@@ -10,7 +11,16 @@ public interface IEmployeeRepository : IGeneralRepository<Employee>
     IEnumerable<Employee> GetAll();
     Employee? GetByGuid(Guid guid);
 
-    IEnumerable<Employee> GetByGuidWithEducation(Guid guid)
+    //IEnumerable<MasterEmployeeVM> GetAllByGuid(Guid guid);
 
+    IEnumerable<MasterEmployeeVM> GetAllMasterEmployee();
+
+        MasterEmployeeVM? GetMasterEmployeeByGuid(Guid guid);
+
+        object GetEmployeeAll(Guid guid);
+
+    public Guid? FindGuidByEmail(string email);
+
+    int CreateWithValidate(Employee employee);
 
 }

@@ -9,4 +9,6 @@ public interface IUniversityRepository : IGeneralRepository<University>
     bool Delete(Guid guid);
     IEnumerable<University> GetAll();
     University? GetByGuid(Guid guid);
+
+    University CreateWithValidate(University university);
 }
