@@ -40,36 +40,30 @@ public class AccountController : ControllerBase
     [HttpPost("login")]
     public IActionResult Login(LoginVM loginVM)
     {
-        var account = _accountRepository.Login(loginVM);
-
-        if (account == null)
+        var respons = new ResponseVM<LoginVM>();
+        try
         {
-            return NotFound(new ResponseVM<string>
-            {
-                Code = StatusCodes.Status404NotFound,
-                Status = HttpStatusCode.NotFound.ToString(),
-                Message = "Account not found"
-            });
-        }
+            var account = _accountRepository.Login(loginVM);
 
-        if (account.Password != loginVM.Password)
+            if (account == null)
+            {
+                return NotFound(respons.NotFound(account));
+            }
+
+            if (account.Password != loginVM.Password)
+            {
+                var message = "Password is invalid";
+                return NotFound(respons.NotFound(message));
+            }
+
+            return Ok(respons.Success(account));
+        }
+        catch (Exception ex)
         {
-            return NotFound(new ResponseVM<string>
-            {
-                Code = StatusCodes.Status404NotFound,
-                Status = HttpStatusCode.NotFound.ToString(),
-                Message = "Password is invalid"
-            });
-        }
 
-        return Ok(
-            new ResponseVM<LoginVM>
-            {
-                Code = StatusCodes.Status200OK,
-                Status = HttpStatusCode.OK.ToString(),
-                Message = "Login Successfully",
-                Data = account
-            });
+            return BadRequest(respons.Error(ex.Message));
+
+        }
     }
 
 
@@ -80,20 +74,28 @@ public class AccountController : ControllerBase
     public IActionResult Register(RegisterVM registerVM)
     {
 
-        var result = _accountRepository.Register(registerVM);
-        switch (result)
+        var respons = new ResponseVM<RegisterVM>();
+        try
         {
-            case 0:
-                return BadRequest("Registration failed");
-            case 1:
-                return BadRequest("Email already exists");
-            case 2:
-                return BadRequest("Phone number already exists");
-            case 3:
-                return Ok("Registration success");
-        }
+            var result = _accountRepository.Register(registerVM);
+            switch (result)
+            {
+                case 0:
+                    return BadRequest(respons.NotFound("Registration failed"));
+                case 1:
+                    return BadRequest(respons.NotFound("Email already exists"));
+                case 2:
+                    return BadRequest(respons.NotFound("Phone number already exists"));
+                case 3:
+                    return Ok(respons.Success("Registration success"));
+            }
 
-        return Ok();
+            return Ok(respons.Success("Berhasil"));
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(respons.Error(ex.Message));
+        }
 
     }
 
@@ -101,34 +103,45 @@ public class AccountController : ControllerBase
     public IActionResult UpdateResetPass(String email)
     {
 
-        var getGuid = _employeeRepository.FindGuidByEmail(email);
-        if (getGuid == null)
+        var respons = new ResponseVM<AccountResetPasswordVM>();
+        try
         {
-            return NotFound("Akun tidak ditemukan");
+            var getGuid = _employeeRepository.FindGuidByEmail(email);
+            if (getGuid == null)
+            {
+                var message = "Akun tidak ditemukan";
+                return NotFound(respons.NotFound(message));
+            }
+
+            var isUpdated = _accountRepository.UpdateOTP(getGuid);
+
+            switch (isUpdated)
+            {
+                case 0:
+                    var message = "OTP belum di update";
+                    return BadRequest(respons.NotFound(message));
+
+                default:
+                    var hasil = new AccountResetPasswordVM
+                    {
+                        Email = email,
+                        OTP = isUpdated
+                    };
+
+                    MailService mailService = new MailService();
+                    mailService.WithSubject("Kode OTP")
+                               .WithBody("OTP anda adalah: " + isUpdated.ToString() + ".\n" +
+                                         "Mohon kode OTP anda tidak diberikan kepada pihak lain" + ".\n" + "Terima kasih.")
+                               .WithEmail(email)
+                               .Send();
+
+                    return Ok(respons.Success(hasil));
+
+            }
         }
-
-        var isUpdated = _accountRepository.UpdateOTP(getGuid);
-
-        switch (isUpdated)
+        catch (Exception ex)
         {
-            case 0:
-                return BadRequest();
-            default:
-                var hasil = new AccountResetPasswordVM
-                {
-                    Email = email,
-                    OTP = isUpdated
-                };
-
-                MailService mailService = new MailService();
-                mailService.WithSubject("Kode OTP")
-                           .WithBody("OTP anda adalah: " + isUpdated.ToString() + ".\n" +
-                                     "Mohon kode OTP anda tidak diberikan kepada pihak lain" + ".\n" + "Terima kasih.")
-                           .WithEmail(email)
-                           .Send();
-
-                return Ok(hasil);
-
+            return BadRequest(respons.Error(ex.Message));
         }
     }
 
@@ -138,26 +151,35 @@ public class AccountController : ControllerBase
     public IActionResult ChangePassword(ChangePasswordVM changePasswordVM)
     {
         // Cek apakah email dan OTP valid
-        var account = _employeeRepository.FindGuidByEmail(changePasswordVM.Email);
-        var changePass = _accountRepository.ChangePasswordAccount(account, changePasswordVM);
-        switch (changePass)
+        var respons = new ResponseVM<ChangePasswordVM>();
+        try
         {
-            case 0:
-                return BadRequest("");
-            case 1:
-                return Ok("Password has been changed successfully");
-            case 2:
-                return BadRequest("Invalid OTP");
-            case 3:
-                return BadRequest("OTP has already been used");
-            case 4:
-                return BadRequest("OTP expired");
-            case 5:
-                return BadRequest("Wrong Password No Same");
-            default:
-                return BadRequest();
+            // Cek apakah email dan OTP valid
+            var account = _employeeRepository.FindGuidByEmail(changePasswordVM.Email);
+            var changePass = _accountRepository.ChangePasswordAccount(account, changePasswordVM);
+            switch (changePass)
+            {
+                case 0:
+                    return BadRequest(respons.Error("Runtime error"));
+                case 1:
+                    return Ok(respons.Success("Password has been changed successfully"));
+                case 2:
+                    return NotFound(respons.Error("Invalid OTP"));
+                case 3:
+                    return NotFound(respons.Error("OTP has already been used"));
+                case 4:
+                    return NotFound(respons.Error("OTP expired"));
+                case 5:
+                    return BadRequest(respons.Error("Wrong Password No Same"));
+                default:
+                    return BadRequest(respons.Error("Runtime error"));
+            }
+
         }
-        return null;
+        catch (Exception ex)
+        {
+            return BadRequest(respons.Error(ex.Message));
+        }
 
     }
 

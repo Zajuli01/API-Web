@@ -1,5 +1,6 @@
 ﻿using API_Web.Contracts;
 using API_Web.Model;
+using API_Web.Others;
 using API_Web.Repositories;
 using API_Web.ViewModels.Accounts;
 using API_Web.ViewModels.Bookings;
@@ -8,6 +9,7 @@ using API_Web.ViewModels.Employees;
 using API_Web.ViewModels.Rooms;
 using API_Web.ViewModels.Universities;
 using Microsoft.AspNetCore.Mvc;
+using System.Net;
 
 namespace API_Web.Controllers;
 
@@ -48,28 +50,46 @@ public class EmployeeController : ControllerBase
         _universityRepository = universityRepository;
         _universityVMMapper = universityVMMapper;
     }
+
+
     [HttpGet("GetAllMasterEmployee")]
     public IActionResult GetAllMasterEmployee()
     {
-        var masterEmployees = _employeeRepository.GetAllMasterEmployee();
-        if (!masterEmployees.Any())
+        var respons = new ResponseVM<IEnumerable<MasterEmployeeVM>>();
+        try
         {
-            return NotFound();
-        }
+            var masterEmployees = _employeeRepository.GetAllMasterEmployee();
+            if (!masterEmployees.Any())
+            {
+                return NotFound(respons.NotFound(masterEmployees));
+            }
 
-        return Ok(masterEmployees);
+            return Ok(respons.Success(masterEmployees));
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(respons.Error(ex.Message));
+        }
     }
 
     [HttpGet("GetMasterEmployeeByGuid")]
-    public IActionResult GetMasterEmployeeByGuid()
+    public IActionResult GetMasterEmployeeByGuid(Guid guid)
     {
-        var masterEmployees = _employeeRepository.GetAll();
-        if (!masterEmployees.Any())
+        var respons = new ResponseVM<MasterEmployeeVM>();
+        try
         {
-            return NotFound();
-        }
+            var masterEmployees = _employeeRepository.GetMasterEmployeeByGuid(guid);
+            if (masterEmployees is null)
+            {
+                return NotFound(respons.NotFound(masterEmployees));
+            }
 
-        return Ok(masterEmployees);
+            return Ok(respons.Success(masterEmployees));
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(respons.Error(ex.Message));
+        }
     }
 
 

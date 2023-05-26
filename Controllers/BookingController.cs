@@ -1,5 +1,6 @@
 ﻿using API_Web.Contracts;
 using API_Web.Model;
+using API_Web.Others;
 using API_Web.Utility;
 using API_Web.ViewModels.Bookings;
 using API_Web.ViewModels.Employees;
@@ -34,14 +35,26 @@ public class BookingController : ControllerBase
     {
         try
         {
-            var bookingDetails = _bookingRepository.GetAllBookingDetail();
+            var results = _bookingRepository.GetAllBookingDetail();
 
-            return Ok(bookingDetails);
-
+            return Ok(new ResponseVM<IEnumerable<BookingDetailVM>>
+            {
+                Code = 200,
+                Status = "OK",
+                Message = "Success",
+                Data = results
+            }
+            );
         }
         catch
         {
-            return Ok("error");
+            return NotFound(new ResponseVM<BookingDetailVM>
+            {
+                Code = 500,
+                Status = "Failed",
+                Message = "Runtime error pada Code",
+            }
+            );
         }
     }
 
@@ -50,33 +63,78 @@ public class BookingController : ControllerBase
     {
         try
         {
-            var booking = _bookingRepository.GetBookingDetailByGuid(guid);
-            if (booking is null)
+            var bookingDetailVM = _bookingRepository.GetBookingDetailByGuid(guid);
+            if (bookingDetailVM is null)
             {
-
-                return NotFound();
+                return NotFound(new ResponseVM<BookingDetailVM>
+                {
+                    Code = 400,
+                    Status = "Failed",
+                    Message = "Data Not Found",
+                    Data = bookingDetailVM
+                }
+                );
             }
 
-            return Ok(booking);
+            return Ok(new ResponseVM<BookingDetailVM>
+            {
+                Code = 200,
+                Status = "OK",
+                Message = "Success",
+                Data = bookingDetailVM
+            }
+            );
+
         }
-        catch
+        catch (Exception ex)
         {
-            return Ok("error");
+            return BadRequest(new ResponseVM<BookingDetailVM>
+            {
+                Code = 500,
+                Status = "Error",
+                Message = ex.Message
+            }
+            );
         }
     }
 
-    [HttpGet("bookinglength")]
+    [HttpGet("bookingduration")]
     public IActionResult GetDuration()
     {
-        var bookingLengths = _bookingRepository.GetBookingDuration();
-        if (!bookingLengths.Any())
+        try
         {
-            return NotFound();
+            var bookingLengths = _bookingRepository.GetBookingDuration();
+            if (!bookingLengths.Any())
+            {
+                return NotFound(new ResponseVM<IEnumerable<BookingDurationVM>>
+                {
+                    Code = 400,
+                    Status = "Failed",
+                    Message = "Data Not Found",
+                    Data = bookingLengths
+                }
+              );
+            }
+            return Ok(new ResponseVM<IEnumerable<BookingDurationVM>>
+            {
+                Code = 200,
+                Status = "OK",
+                Message = "Success",
+                Data = bookingLengths
+            }
+               );
         }
-
-        return Ok(bookingLengths);
+        catch (Exception ex)
+        {
+            return BadRequest(new ResponseVM<BookingDetailVM>
+            {
+                Code = 500,
+                Status = "Error",
+                Message = ex.Message
+            }
+            );
+        }
     }
-
 
 
 

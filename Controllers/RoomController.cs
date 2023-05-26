@@ -43,14 +43,35 @@ public class RoomController : ControllerBase
             var room = _roomRepository.GetRoomByDate();
             if (room is null)
             {
-                return Ok("tidak ada data");
+                return NotFound(new ResponseVM<IEnumerable<RoomBookedTodayVM>>
+                {
+                    Code = 400,
+                    Status = "Not Found",
+                    Message = "Ruangan Tidak Ditemukan",
+                    Data = room
+                }
+                    );
             }
 
-            return Ok(room);
+            return Ok(new ResponseVM<IEnumerable<RoomBookedTodayVM>>
+            {
+
+                Code = 200,
+                Status = "OK",
+                Message = "Success",
+                Data = room
+            }
+                );
         }
         catch
         {
-            return Ok("ada error");
+            return NotFound(new ResponseVM<RoomBookedTodayVM>
+            {
+                Code = 500,
+                Status = "Failed",
+                Message = "Runtime error acces Server",
+            }
+              );
         }
     }
 
@@ -58,21 +79,22 @@ public class RoomController : ControllerBase
     [HttpGet("CurrentlyUsedRooms")]
     public IActionResult GetCurrentlyUsedRooms()
     {
-        var room = _roomRepository.GetCurrentlyUsedRooms();
-        if (room is null)
+        var respons = new ResponseVM<IEnumerable<RoomUsedVM>>();
+        try
         {
-            return NotFound();
+            var room = _roomRepository.GetCurrentlyUsedRooms();
+            if (room.Count() < 1)
+            {
+                return NotFound(respons.NotFound(room));
+            }
+            var succes = respons.Success(room);
+            return Ok(succes);
         }
-        var response = new ResponseVM<List<RoomUsedVM>>
+        catch (Exception ex)
         {
-            Code = StatusCodes.Status200OK,                     // Success code
-            Status = "Success",             // Status message
-            Message = "Room Tidak ada",    // Additional message if needed
-            Data = (List<RoomUsedVM>)room
-        };
 
-
-        return Ok(response);
+            return BadRequest(respons.Error(ex.Message));
+        }
     }
 
 
@@ -82,12 +104,21 @@ public class RoomController : ControllerBase
     [HttpGet("GetCurrentlyUsedRoomsByDateTime")]
     public IActionResult GetCurrentlyUsedRooms(DateTime dateTime)
     {
-        var room = _roomRepository.GetByDate(dateTime);
-        if(room is null)
+        var respons = new ResponseVM<IEnumerable<MasterRoomVM>>();
+        try
         {
-            return NotFound();
+            var room = _roomRepository.GetByDate(dateTime);
+            if (room is null)
+            {
+                return NotFound(respons.NotFound(room));
+            }
+
+            return Ok(respons.Success(room));
         }
-        return Ok(room);
+        catch (Exception ex)
+        {
+            return BadRequest(respons.Error(ex.Message));
+        }
     }
 
 
