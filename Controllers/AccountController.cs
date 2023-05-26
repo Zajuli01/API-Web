@@ -1,11 +1,13 @@
 ﻿using API_Web.Contracts;
 using API_Web.Model;
+using API_Web.Others;
 using API_Web.Utility;
 using API_Web.ViewModels.AccountRoles;
 using API_Web.ViewModels.Accounts;
 using API_Web.ViewModels.Bookings;
 using API_Web.ViewModels.Employees;
 using Microsoft.AspNetCore.Mvc;
+using System.Net;
 
 namespace API_Web.Controllers;
 
@@ -42,15 +44,32 @@ public class AccountController : ControllerBase
 
         if (account == null)
         {
-            return NotFound("Account not found");
+            return NotFound(new ResponseVM<string>
+            {
+                Code = StatusCodes.Status404NotFound,
+                Status = HttpStatusCode.NotFound.ToString(),
+                Message = "Account not found"
+            });
         }
 
         if (account.Password != loginVM.Password)
         {
-            return BadRequest("Password is invalid");
+            return NotFound(new ResponseVM<string>
+            {
+                Code = StatusCodes.Status404NotFound,
+                Status = HttpStatusCode.NotFound.ToString(),
+                Message = "Password is invalid"
+            });
         }
 
-        return Ok("Login Successfully");
+        return Ok(
+            new ResponseVM<LoginVM>
+            {
+                Code = StatusCodes.Status200OK,
+                Status = HttpStatusCode.OK.ToString(),
+                Message = "Login Successfully",
+                Data = account
+            });
     }
 
 
