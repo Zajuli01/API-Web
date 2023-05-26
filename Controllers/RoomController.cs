@@ -1,5 +1,6 @@
 ﻿using API_Web.Contracts;
 using API_Web.Model;
+using API_Web.Others;
 using API_Web.Repositories;
 using API_Web.ViewModels.Bookings;
 using API_Web.ViewModels.Educations;
@@ -62,15 +63,23 @@ public class RoomController : ControllerBase
         {
             return NotFound();
         }
+        var response = new ResponseVM<List<RoomUsedVM>>
+        {
+            Code = StatusCodes.Status200OK,                     // Success code
+            Status = "Success",             // Status message
+            Message = "Room Tidak ada",    // Additional message if needed
+            Data = (List<RoomUsedVM>)room
+        };
 
-        return Ok(room);
+
+        return Ok(response);
     }
 
 
 
 
 
-    [HttpGet("GetCurrentlyUsedRooms")]
+    [HttpGet("GetCurrentlyUsedRoomsByDateTime")]
     public IActionResult GetCurrentlyUsedRooms(DateTime dateTime)
     {
         var room = _roomRepository.GetByDate(dateTime);
