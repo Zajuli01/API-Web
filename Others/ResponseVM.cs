@@ -1,4 +1,6 @@
-﻿namespace API_Web.Others;
+﻿using System.Net;
+
+namespace API_Web.Others;
 
 public class ResponseVM<TEntity>
 {
@@ -35,6 +37,15 @@ public class ResponseVM<TEntity>
             Code = 400,
             Status = "null",
             Message = keterangan
+        };
+    }
+    public ResponseVM<TEntity> NotFound()
+    {
+        return new ResponseVM<TEntity>
+        {
+            Code = 400,
+            Status = HttpStatusCode.NotFound.ToString(),
+            Message = "Data Tidak ada"
         };
     }
     public ResponseVM<TEntity> NotFound(TEntity entity)

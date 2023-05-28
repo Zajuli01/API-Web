@@ -24,6 +24,12 @@ builder.Services.AddScoped<IRoomRepository, RoomRepository>();
 
 builder.Services.AddSingleton(typeof(IMapper<,>), typeof(Mapper<,>));
 
+builder.Services.AddTransient<IEmailService, EmailService>(_ => new EmailService(
+    smtpServer: builder.Configuration["Enail:SmtpServer"],
+    smtpPort: int.Parse(builder.Configuration["Email:SmtpPort"]),
+    fromEmailAddress: builder.Configuration["Email:FromEmailAddress"]
+    ));
+
 
 
 

@@ -8,6 +8,7 @@ using API_Web.ViewModels.Bookings;
 using API_Web.ViewModels.Employees;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
+using static API_Web.Utility.EmailService;
 
 namespace API_Web.Controllers;
 
@@ -21,13 +22,17 @@ public class AccountController : ControllerBase
     private readonly IMapper<Account, AccountVM> _mapper;
     private readonly IMapper<Employee, EmployeeVM> _employeeVMMapper;
     private readonly IMapper<AccountRole, AccountRoleVM> _accountRoleVMMapper;
+    private readonly EmailService _emailService;
 
-    public AccountController(IAccountRepository accountRepository, 
-        IEmployeeRepository employeeRepository, 
-        IAccountRoleRepository accountRoleRepository, 
+
+
+    public AccountController(IAccountRepository accountRepository,
+        IEmployeeRepository employeeRepository,
+        IAccountRoleRepository accountRoleRepository,
         IMapper<Account, AccountVM> mapper,
         IMapper<Employee, EmployeeVM> employeeVMMapper,
-        IMapper<AccountRole, AccountRoleVM> accountRoleVMMapper)
+        IMapper<AccountRole, AccountRoleVM> accountRoleVMMapper,
+        EmailService emailService)
     {
         _accountRepository = accountRepository;
         _employeeRepository = employeeRepository;
@@ -35,6 +40,7 @@ public class AccountController : ControllerBase
         _mapper = mapper;
         _employeeVMMapper = employeeVMMapper;
         _accountRoleVMMapper = accountRoleVMMapper;
+        _emailService = emailService;
     }
 
     [HttpPost("login")]
@@ -50,7 +56,10 @@ public class AccountController : ControllerBase
                 return NotFound(respons.NotFound(account));
             }
 
-            if (account.Password != loginVM.Password)
+            var currentlyHash = Hashing.HashPassword(loginVM.Password);
+            var validatePassword = Hashing.ValidatePassword(loginVM.Password, currentlyHash);
+            //if (account.Password != loginVM.Password)
+            if (!validatePassword)
             {
                 var message = "Password is invalid";
                 return NotFound(respons.NotFound(message));
@@ -128,12 +137,19 @@ public class AccountController : ControllerBase
                         OTP = isUpdated
                     };
 
-                    MailService mailService = new MailService();
-                    mailService.WithSubject("Kode OTP")
-                               .WithBody("OTP anda adalah: " + isUpdated.ToString() + ".\n" +
-                                         "Mohon kode OTP anda tidak diberikan kepada pihak lain" + ".\n" + "Terima kasih.")
-                               .WithEmail(email)
-                               .Send();
+                    EmailService _emailService = new EmailService("localhost", 25, "no-reply@mcc.com");
+                    //EmailService _emailService = new EmailService();
+                    _emailService.SetEmail(hasil.Email)
+                        .SetSubject("Forgot Password")
+                        .SetHtmlMessage($"Your OTP is {hasil.OTP}")
+                        .SentEmailAsynch();
+
+                    //MailService mailService = new MailService();
+                    //mailService.WithSubject("Kode OTP")
+                    //           .WithBody("OTP anda adalah: " + isUpdated.ToString() + ".\n" +
+                    //                     "Mohon kode OTP anda tidak diberikan kepada pihak lain" + ".\n" + "Terima kasih.")
+                    //           .WithEmail(email)
+                    //           .Send();
 
                     return Ok(respons.Success(hasil));
 

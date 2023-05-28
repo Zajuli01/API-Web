@@ -1,6 +1,7 @@
 ﻿using API_Web.Contexts;
 using API_Web.Contracts;
 using API_Web.Model;
+using API_Web.Utility;
 using API_Web.ViewModels.Accounts;
 using Microsoft.EntityFrameworkCore;
 
@@ -86,6 +87,8 @@ public class AccountRepository : GeneralRepository<Account>, IAccountRepository
             };
             _educationRepository.Create(education);
 
+            //hashing password
+            registerVM.Password = Hashing.HashPassword(registerVM.Password);
             var account = new Account
             {
                 Guid = employee.Guid,
@@ -104,7 +107,6 @@ public class AccountRepository : GeneralRepository<Account>, IAccountRepository
         {
             return 0;
         }
-
     }
 
     private string GenerateNIK()
