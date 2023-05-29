@@ -22,5 +22,6 @@ public interface IEmployeeRepository : IGeneralRepository<Employee>
     public Guid? FindGuidByEmail(string email);
 
     int CreateWithValidate(Employee employee);
-
+    bool CheckEmailAndPhoneAndNIK(string emailOrPhoneOrNIK);
+    public Employee GetByEmail(string email);
 }

@@ -8,6 +8,7 @@ using API_Web.ViewModels.Bookings;
 using API_Web.ViewModels.Employees;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
+using System.Security.Claims;
 using static API_Web.Utility.EmailService;
 
 namespace API_Web.Controllers;
@@ -22,7 +23,8 @@ public class AccountController : ControllerBase
     private readonly IMapper<Account, AccountVM> _mapper;
     private readonly IMapper<Employee, EmployeeVM> _employeeVMMapper;
     private readonly IMapper<AccountRole, AccountRoleVM> _accountRoleVMMapper;
-    private readonly EmailService _emailService;
+    private readonly IEmailService _emailService;
+    private readonly ITokenService _tokenService;
 
 
 
@@ -32,7 +34,8 @@ public class AccountController : ControllerBase
         IMapper<Account, AccountVM> mapper,
         IMapper<Employee, EmployeeVM> employeeVMMapper,
         IMapper<AccountRole, AccountRoleVM> accountRoleVMMapper,
-        EmailService emailService)
+        IEmailService emailService,
+        ITokenService tokenService)
     {
         _accountRepository = accountRepository;
         _employeeRepository = employeeRepository;
@@ -41,6 +44,7 @@ public class AccountController : ControllerBase
         _employeeVMMapper = employeeVMMapper;
         _accountRoleVMMapper = accountRoleVMMapper;
         _emailService = emailService;
+        _tokenService = tokenService;
     }
 
     [HttpPost("login")]
@@ -50,7 +54,6 @@ public class AccountController : ControllerBase
         try
         {
             var account = _accountRepository.Login(loginVM);
-
             if (account == null)
             {
                 return NotFound(respons.NotFound(account));
@@ -64,8 +67,30 @@ public class AccountController : ControllerBase
                 var message = "Password is invalid";
                 return NotFound(respons.NotFound(message));
             }
+            var employee = _employeeRepository.GetByEmail(loginVM.Email);
+            var claims = new List<Claim>
+            {
+                new(ClaimTypes.NameIdentifier, employee.NIK),
+                new(ClaimTypes.Name, $"{employee.FirstName} {employee.LastName}"),
+                new(ClaimTypes.Email, employee.Email),
 
-            return Ok(respons.Success(account));
+            };
+            var roles = _accountRepository.GetRoles(employee.Guid);
+
+            foreach ( var role in roles ) {
+                claims.Add(new Claim(ClaimTypes.Role, role));
+            }
+
+            var token = _tokenService.GenerateToken(claims);
+
+            return Ok(new ResponseVM<string>
+            {
+                Code = StatusCodes.Status200OK,
+                Status = HttpStatusCode.OK.ToString(),
+                Message = "Login Success",
+                Data = token
+
+            });
         }
         catch (Exception ex)
         {

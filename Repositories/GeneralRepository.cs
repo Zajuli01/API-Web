@@ -7,7 +7,7 @@ namespace API_Web.Repositories;
 
 public class GeneralRepository<TEntity> : IGeneralRepository<TEntity> where TEntity : class
 {
-    private readonly BookingManagementDBContext _context;
+    protected readonly BookingManagementDBContext _context;
     public GeneralRepository(BookingManagementDBContext context)
     {
         _context = context;

@@ -30,6 +30,7 @@ builder.Services.AddTransient<IEmailService, EmailService>(_ => new EmailService
     fromEmailAddress: builder.Configuration["Email:FromEmailAddress"]
     ));
 
+builder.Services.AddScoped<ITokenService, TokenService>();
 
 
 

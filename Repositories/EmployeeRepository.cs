@@ -7,8 +7,6 @@ namespace API_Web.Repositories;
 
 public class EmployeeRepository : GeneralRepository<Employee>, IEmployeeRepository
 {
-    private readonly BookingManagementDBContext _context;
-
     private readonly IEmployeeRepository _employeeRepository;
     private readonly IEducationRepository _educationRepository;
     private readonly IAccountRepository _accountRepository;
@@ -22,10 +20,31 @@ public class EmployeeRepository : GeneralRepository<Employee>, IEmployeeReposito
         _universityRepository = universityRepository;
     }
 
+    public bool CheckEmailAndPhoneAndNIK(string emailOrPhoneOrNIK)
+    {
+        // Perform the necessary logic to check if the email or phone number already exists in your repository
+        // Return true if it exists, false otherwise
+        // Example implementation:
+        // Assuming you have a collection or database table for employees,
+        // you can check if the email or phone number exists in the collection or table.
+        // Replace the code below with your actual implementation.
+
+        
+        return _context.Employees.Any(e => e.Email == emailOrPhoneOrNIK || e.PhoneNumber == emailOrPhoneOrNIK || e.NIK == emailOrPhoneOrNIK);
+
+    }
+
+
     public int CreateWithValidate(Employee employee)
     {
         try
         {
+            var isEmployeeExist = _context.Employees.ToList();
+            if (isEmployeeExist.Count == 0)
+            {
+                return 3;
+            }
+
             bool ExistsByEmail = _context.Employees.Any(e => e.Email == employee.Email);
             if (ExistsByEmail)
             {
@@ -150,6 +169,12 @@ public class EmployeeRepository : GeneralRepository<Employee>, IEmployeeReposito
         };
 
         return data;
+    }
+
+    public Employee GetByEmail(string email)
+    {
+        var emp = _context.Set<Employee>().FirstOrDefault(e => e.Email == email);
+            return emp;
     }
 
 

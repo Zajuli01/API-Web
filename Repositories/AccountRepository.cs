@@ -1,9 +1,11 @@
 ﻿using API_Web.Contexts;
 using API_Web.Contracts;
 using API_Web.Model;
+using API_Web.Others;
 using API_Web.Utility;
 using API_Web.ViewModels.Accounts;
 using Microsoft.EntityFrameworkCore;
+using System.Security.Claims;
 
 namespace API_Web.Repositories;
 
@@ -12,19 +14,18 @@ public class AccountRepository : GeneralRepository<Account>, IAccountRepository
     private readonly IEmployeeRepository _employeeRepository;
     private readonly IUniversityRepository _universityRepository;
     private readonly IEducationRepository _educationRepository;
-    private readonly BookingManagementDBContext _context;
+    private readonly ITokenService _tokenService;
+
 
     public AccountRepository(
         BookingManagementDBContext context,
         IUniversityRepository universityRepository,
         IEmployeeRepository employeeRepository,
-        IEducationRepository educationRepository
-    ) : base(context)
+        IEducationRepository educationRepository) : base(context)
     {
         _universityRepository = universityRepository;
         _employeeRepository = employeeRepository;
         _educationRepository = educationRepository;
-        _context = context;
     }
 
 
@@ -70,12 +71,12 @@ public class AccountRepository : GeneralRepository<Account>, IAccountRepository
                 Email = registerVM.Email,
                 PhoneNumber = registerVM.PhoneNumber,
             };
-            var result = _employeeRepository.CreateWithValidate(employee);
+            var result = _employeeRepository.Create(employee);
 
-            if (result != 3)
-            {
-                return result;
-            }
+            //if (result != 3)
+            //{
+            //    return result;
+            //}
 
             var education = new Education
             {
@@ -198,5 +199,23 @@ public class AccountRepository : GeneralRepository<Account>, IAccountRepository
         }
     }
 
+    public IEnumerable<string> GetRoles(Guid guid)
+    {
+        var getAccount = GetByGuid(guid);
+        if (getAccount == null) return Enumerable.Empty<string>();
+    // Implement other methods of the account repository interface
+        var roles = new List<string>();
 
+        // Perform the join operation using LINQ
+        var joinedRoles = from role in _context.Roles
+                          join accountRole in _context.AccountRoles
+                              on role.Guid equals accountRole.RoleGuid
+                          where accountRole.AccountGuid == guid
+                          select role.Name;
+
+        roles.AddRange(joinedRoles);
+
+        return roles;
+        
+    }
 }

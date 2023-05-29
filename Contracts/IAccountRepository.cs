@@ -19,4 +19,6 @@ public interface IAccountRepository : IGeneralRepository<Account>
 
     LoginVM Login(LoginVM loginVM);
 
+    IEnumerable<string> GetRoles(Guid guid);
+
 }
