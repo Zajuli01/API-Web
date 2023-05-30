@@ -18,7 +18,6 @@ public class BookingManagementDBContext : DbContext
     public DbSet<Role> Roles { get; set; }
     public DbSet<Room> Rooms { get; set; }
     public DbSet<University> Universities { get; set; }
-
     protected override void OnModelCreating(ModelBuilder builder)
     {
         base.OnModelCreating(builder);
@@ -90,7 +89,6 @@ public class BookingManagementDBContext : DbContext
                .HasOne(r => r.Room)
                .WithMany(b => b.Bookings)
                .HasForeignKey(e => e.RoomGuid);
-
     }
 
 }

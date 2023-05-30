@@ -100,7 +100,6 @@ public class AccountRepository : GeneralRepository<Account>, IAccountRepository
             };
 
             Create(account);
-
             var accountRole = new AccountRole
             {
                 RoleGuid = Guid.Parse("9e8b7346-0bdb-4dda-2072-08db60bf1afd"),

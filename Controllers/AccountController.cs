@@ -122,9 +122,6 @@ public class AccountController : ControllerBase
         }
     }
 
-
-
-
     [HttpPost("Register")]
 
     public IActionResult Register(RegisterVM registerVM)
