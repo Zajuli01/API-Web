@@ -1,11 +1,14 @@
 ﻿using API_Web.Contracts;
 using API_Web.Others;
+using API_Web.Utility;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace API_Web.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
+[Authorize(Roles = $"{nameof(RoleLevel.Manager)}, {nameof(RoleLevel.Admin)}")]
 public abstract class GeneralController<TEntity, TEntityVM, TInterfaceEntity> : ControllerBase where TEntity : class
         where TEntityVM : class
         where TInterfaceEntity : class

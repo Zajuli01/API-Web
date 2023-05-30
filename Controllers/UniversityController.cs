@@ -2,12 +2,14 @@
 using API_Web.Model;
 using API_Web.ViewModels.Educations;
 using API_Web.ViewModels.Universities;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace API_Web.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
+[Authorize]
 public class UniversityController : ControllerBase
 {
     private readonly IUniversityRepository _universityRepository;
@@ -22,7 +24,7 @@ public class UniversityController : ControllerBase
         _educationVMMapper = educationMapper;
     }
 
-
+    [Authorize(Roles = "Manager")]
     [HttpGet("WithEducation")]
     public IActionResult GetAllWithEducation()
     {

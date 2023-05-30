@@ -51,13 +51,13 @@ public class AccountController : ControllerBase
     public IActionResult GetToken(string token)
     {
         var data = _tokenService.ExtractClaimsFromJwt(token);
-        if (data is null)
+        if (data == null)
         {
-            return NotFound(new ResponseVM<ClaimVM>
+            return BadRequest(new ResponseVM<string>
             {
-                Code = StatusCodes.Status404NotFound,
-                Status = HttpStatusCode.NotFound.ToString(),
-                Message = "Not Found Used Room"
+                Code = StatusCodes.Status400BadRequest,
+                Status = HttpStatusCode.BadRequest.ToString(),
+                Message = "Token is Invalid"
             });
         }
         return Ok(new ResponseVM<ClaimVM>
