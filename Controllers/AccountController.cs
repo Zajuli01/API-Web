@@ -47,6 +47,28 @@ public class AccountController : ControllerBase
         _tokenService = tokenService;
     }
 
+    [HttpGet("Token")]
+    public IActionResult GetToken(string token)
+    {
+        var data = _tokenService.ExtractClaimsFromJwt(token);
+        if (data is null)
+        {
+            return NotFound(new ResponseVM<ClaimVM>
+            {
+                Code = StatusCodes.Status404NotFound,
+                Status = HttpStatusCode.NotFound.ToString(),
+                Message = "Not Found Used Room"
+            });
+        }
+        return Ok(new ResponseVM<ClaimVM>
+        {
+            Code = StatusCodes.Status200OK,
+            Status = HttpStatusCode.OK.ToString(),
+            Message = "Found Used Room",
+            Data = data
+        });
+    }
+
     [HttpPost("login")]
     public IActionResult Login(LoginVM loginVM)
     {
